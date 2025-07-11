@@ -14,7 +14,7 @@ function App() {
       setLoading(true)
       setResult('')
 
-      const response = await fetch('/api/enhance', {
+      const response = await fetch('https://ai-product-description-enhancer.vercel.app/api/enhance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input, tone }),
