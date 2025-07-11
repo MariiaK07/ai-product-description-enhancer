@@ -9,29 +9,34 @@ function App() {
 
   const tones = ['Friendly', 'Professional', 'Persuasive']
 
-  const enhanceDescription = async () => {
+  async function enhanceDescription(description: string, tone: string) {
     try {
-      setLoading(true)
-      setResult('')
-
-      const response = await fetch('https://ai-product-description-enhancer.vercel.app/api/enhance', {
+      const response = await fetch('/api/enhance', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input, tone }),
-      })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ description, tone }),
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error?.error || 'Something went wrong')
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Something went wrong');
       }
 
-      const data = await response.json()
-      setResult(data.result)
-      setLoading(false)
-    } catch (err: any) {
-      alert(`❌ Error: ${err.message}\nPlease check your API key, server, or billing.`)
-      setLoading(false)
+      const data = await response.json();
+      return data.result;
+    } catch (error: any) {
+      console.error('Enhancement error:', error.message);
+      return `⚠️ Error: ${error.message}`;
     }
+  }
+
+  const handleClick = async () => {
+    setLoading(true)
+    const enhanced = await enhanceDescription(input, tone)
+    setResult(enhanced)
+    setLoading(false)
   }
 
   return (
@@ -52,7 +57,7 @@ function App() {
         ))}
       </select>
       <br />
-      <button onClick={enhanceDescription} disabled={loading}>
+      <button onClick={handleClick} disabled={loading}>
         {loading ? 'Enhancing...' : 'Enhance'}
       </button>
 
