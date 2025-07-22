@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { ContactForm } from './ContactForm'
 
 function App() {
   const [input, setInput] = useState('')
@@ -11,7 +12,10 @@ function App() {
 
   async function enhanceDescription(description: string, tone: string) {
     try {
-      const response = await fetch('/api/enhance', {
+      const baseUrl = import.meta.env.DEV
+        ? 'http://localhost:3000'
+        : 'https://ai-product-description-enhancer.vercel.app'
+      const response = await fetch(`${baseUrl}/api/enhance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,6 +73,10 @@ function App() {
           </div>
         </>
       )}
+
+      <h3 style={{ marginTop: 30 }}>Stay Updated</h3>
+      <p>Join our list to get new features and tips.</p>
+      <ContactForm />
     </div>
   )
 }

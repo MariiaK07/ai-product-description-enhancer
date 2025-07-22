@@ -1,12 +1,16 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).send({ message: 'Only POST requests allowed' });
+    return res
+      .status(405)
+      .json({ error: 'Only POST requests allowed' });
   }
 
   const { description, tone } = req.body;
 
   if (!description) {
-    return res.status(400).json({ error: 'Missing product description' });
+    return res
+      .status(400)
+      .json({ error: 'Missing product description' });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
@@ -30,10 +34,22 @@ export default async function handler(req, res) {
     });
 
     const data = await completion.json();
-    const reply = data.choices?.[0]?.message?.content;
 
-    res.status(200).json({ result: reply || '' });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    if (!completion.ok) {
+      return res
+        .status(completion.status)
+        .json({ error: data.error?.message || 'OpenAI error' });
+    }
+
+    const reply = data.choices?.[0]?.message?.content || '';
+
+    return res
+      .status(200)
+      .json({ result: reply });
+  } catch (err) {
+    console.error('API Error:', err);
+    return res
+      .status(500)
+      .json({ error: 'Server error' });
   }
 }
